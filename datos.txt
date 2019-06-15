@@ -1,0 +1,5 @@
+M2: 100g
+Distancias:
+	D1: 30cm
+	D2: 20cm
+	D3: 40cm
