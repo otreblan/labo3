@@ -7,6 +7,11 @@
 \usepackage[shortlabels]{enumitem}
 \usepackage{import}
 \usepackage{xcolor}
+\usepackage{ifluatex}
+
+\usepackage{silence}
+\WarningFilter{latex}{You have requested package}
+\usepackage{luapackageloader}
 
 %Esto sirve para poner ecuaciones
 \usepackage{mathtools}
@@ -98,6 +103,7 @@ Porque no depende del tiempo.
 
 %Sin esta cosa pgfplots da errores. {{{
 \shorthandoff{"}
+
 %https://tex.stackexchange.com/questions/340661/argument-of-languageactivearg-has-an-extra-i-use-includegraphics-and-r/340663#340663
 
 %d=30cm{{{
@@ -161,7 +167,7 @@ Porque no depende del tiempo.
 	\end{tikzpicture}
 \end{figure}%}}}
 
-%d=20cm{{{
+%zad=20cm{{{
 \begin{figure}[H]
 	\centering
 	\begin{tikzpicture}
@@ -203,7 +209,7 @@ Porque no depende del tiempo.
 				{d2.csv};
 			\addplot[
 				% Opciones {{{
-				restrict x to domain=0.6:1.2,
+				restrict x to domain=0.6:1.15,
 				color=red,
 				smooth,
 				ultra thick
@@ -285,9 +291,103 @@ Porque no depende del tiempo.
 \shorthandon{"}%}}}
 
 Casi.
-No son completamente rectas y al parecer el sensor estaba al revés.
+No son completamente rectas y además el sistema estaba al revés.
 
 \subsection{Comparar en valor de la aceleración promedio medida con el teórico. Comentar.}%
+
+\directlua{
+	package.path='/usr/share/lua/5.3/?.lua'
+	csv = require('csv')
+}
+
+\directlua{
+	function promedio(file, min, max)
+	local f = csv.open(file)
+
+	local sum = 0
+	local counter = 0
+	local datos = {}
+
+	for fields in f:lines() do
+		local time = tonumber(fields[1])
+		if time then
+			if ( time >= min and time <= max) then
+				counter = counter + 1
+				sum = sum + fields[4]
+				datos[counter] = fields[4]
+			end
+		end
+	end
+	return{(sum/counter), counter, datos}
+	end
+}
+
+\directlua{
+	promedios = {}
+	promedios[1] = promedio('d1.csv', 0.5, 1.3)
+	promedios[2] = promedio('d2.csv', 0.6, 1.15)
+	promedios[3] = promedio('d3.csv', 0.7, 1.65)
+
+	promedio = (promedios[1][1]+promedios[2][1]+promedios[3][1])/3
+
+	samples = promedios[1][2]+promedios[2][2]+promedios[3][2]
+}
+
+Valor medio de la aceleración angular:
+\begin{align*}
+	\overline{\alpha} &= \frac{\overline{\alpha_1}+\overline{\alpha_2}+\overline{\alpha}_3}{3}  \\
+	\overline{\alpha}&=\frac{
+		\directlua{tex.print(promedios[1][1])}
+		\directlua{tex.print(promedios[2][1])}
+		\directlua{tex.print(promedios[3][1])}}{3}
+	\frac{rad}{s^2} = \directlua{tex.print(promedio)} \frac{rad}{s^2}
+\end{align*}
+
+Valor teórico:
+\begin{align*}
+	\alpha =76.58 \frac{rad}{s^2}
+\end{align*}
+
+Observaciones tomadas $n_n$
+\begin{align*}
+	n &= n_1 + n_2 + n_3\\
+	n &= \directlua{tex.print(promedios[1][2])} +\directlua{tex.print(promedios[2][2])}+\directlua{tex.print(promedios[3][2])}\\
+	n &= \directlua{tex.print(samples)}
+\end{align*}
+
+\directlua{
+	varianIncompleta = 0
+	for ii=1, 3 do
+		for jj=1, promedios[1][2] do
+			varianIncompleta = varianIncompleta + (promedios[1][3][jj] - promedio)^2
+		end
+	end
+	varianza = varianIncompleta/samples
+	desviacion = math.sqrt(varianIncompleta/(samples*(samples-1)))
+}
+
+Varianza muestral $s^2$
+\begin{align*}
+	s^2 &= \frac{1}{n} \sum^n_{i=1}(x_i-\overline{x})^2\\
+	s^2 &= \frac{\directlua{tex.print(varianIncompleta)}}{\directlua{tex.print(samples)}}\\
+	s^2 &= \directlua{tex.print(varianza)}
+\end{align*}
+
+Desviación típica $\sigma$
+\begin{align*}
+	\sigma &= \sqrt{ \frac{\sum^n_{i=1}(x_i-\overline{x})^2}{n(n-1)} }\\
+	\sigma &= \sqrt{ \frac{\directlua{tex.print(varianIncompleta)}}{\directlua{tex.print((samples-1)*samples)}} }\\
+	\sigma &= \directlua{tex.print(desviacion)}
+\end{align*}
+
+Incertidumbre
+\begin{align*}
+	(\directlua{tex.print(promedio)}\pm\directlua{tex.print(desviacion*10)}*10^{-1}) \frac{rad}{s^2}
+\end{align*}
+
+Esta invertido.
+Y el valor absoluto medido es menor que el teórico.
+En la prueba de la fórmula la masa $m_2$ estaba a la izquierda, mientras que en el laboratorio estaba a la derecha.
 
 \subsection{Utilizando  TRABAJO  Y  ENERGÍA,
 determinar  la  velocidad  final  de  la  masa  2 (m2).
