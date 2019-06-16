@@ -395,10 +395,14 @@ Esto quiere decir, un instante antes de detenerse la masa 1.}%
 
 Distancia del carrito a la pared $d=0.4m$
 \begin{align*}
-	W &= d_2*\cancel{m_2}g*\cancel{\cos{0}} = \frac{1}{2} \cancel{m_2}v^2\\
-	v_2 &= \sqrt{2d_2g} && d_2 =\frac{2d}{r_1}*r_2\\
-	v_2 &= \sqrt{2\frac{0.8\cancel{m}}{0.024\cancel{m}}*0.0145m*9.81 \frac{m}{s^2} }\\
-	v_2 &= 3.08\frac{m}{s^2}
+	\sum W &= d_2*m_2g*\cancel{\cos{0}} + d_2*T_2*\cos{180}= \frac{1}{2} m_2v_2^2\\
+	v_2 &= \sqrt{\frac{2d_2(m_2g-T_2)}{m_2}}&&T_2 = m_2*(g-\alpha*r_2)\\
+	v_2 &= \sqrt{\frac{2d_2\cancel{m_2}(\cancel{g}-\cancel{g}+\alpha*r_2)}{\cancel{m_2}}}&&d_2 =\frac{2d}{r_1}*r_2\\
+	v_2 &= \sqrt{ \frac{4dr_2^2\alpha}{r_1} }\\
+	v_2 &= 1.04 \frac{m}{s}
+	%v_2 &= \sqrt{2d_2g} && d_2 =\frac{2d}{r_1}*r_2\\
+	%v_2 &= \sqrt{2\frac{0.8\cancel{m}}{0.024\cancel{m}}*0.0145m*9.81 \frac{m}{s^2} }\\
+	%v_2 &= 3.08\frac{m}{s}
 \end{align*}
 
 \subsection{A partir de las mediciones realizadas,
@@ -468,7 +472,7 @@ Comentar.}%
 				restrict x to domain=1.71:1.75,
 				nodes near coords={
 				$(\pgfmathprintnumber{\pgfkeysvalueof{/data point/x}}s,
-				\pgfmathprintnumber{\pgfkeysvalueof{/data point/y}}\frac{m}{s^2})$},
+				\pgfmathprintnumber{\pgfkeysvalueof{/data point/y}}\frac{m}{s})$},
 				nodes near coords align={above},
 				color=black,
 				smooth,
@@ -490,8 +494,9 @@ Comentar.}%
 \end{figure}%}}}
 \shorthandon{"}
 
-Me siento confundido.
-Es muy diferente al valor teórico.
-Además está invertido.
+%Me siento confundido.
+%Es muy diferente al valor teórico.
+El valor absoluto sigue siendo menor al teórico.
+Y sigue invertido.
 
 \end{document}
